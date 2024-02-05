@@ -1,10 +1,26 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 import tcod.event
-from handlers.actions import Action, EscapeAction, BumpAction
+from handlers.actions import Action, EscapeAction, BumpAction, WaitAction
 
 if TYPE_CHECKING:
     from handlers.engine import Engine
+
+MOVE_KEYS = {
+    tcod.event.KeySym.w: (0, -1),
+    tcod.event.KeySym.s: (0, 1),
+    tcod.event.KeySym.a: (-1, 0),
+    tcod.event.KeySym.d: (1, 0),
+    # diagonal movement
+    tcod.event.KeySym.HOME: (-1, -1),
+    tcod.event.KeySym.END: (-1, 1),
+    tcod.event.KeySym.PAGEUP: (1, -1),
+    tcod.event.KeySym.PAGEDOWN: (1, 1),
+}
+
+WAIT_KEYS = {
+    tcod.event.KeySym.PERIOD,
+}
 
 
 class EventHandler(tcod.event.EventDispatch[Action]):
@@ -33,14 +49,12 @@ class EventHandler(tcod.event.EventDispatch[Action]):
         
         player = self.engine.player
 
-        if key == tcod.event.KeySym.w:
-            action = BumpAction(player, dx=0, dy=-1)
-        elif key == tcod.event.KeySym.s:
-            action = BumpAction(player, dx=0, dy=1)
-        elif key == tcod.event.KeySym.a:
-            action = BumpAction(player, dx=-1, dy=0)
-        elif key == tcod.event.KeySym.d:
-            action = BumpAction(player, dx=1, dy=0)
+        if key in MOVE_KEYS:
+            dx, dy = MOVE_KEYS[key]
+            action = BumpAction(player, dx, dy)
+
+        elif key in WAIT_KEYS:
+            action = WaitAction(player)
 
         elif key == tcod.event.KeySym.ESCAPE:
             action = EscapeAction(player)
