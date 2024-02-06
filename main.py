@@ -10,17 +10,19 @@ import tcod.tileset
 import entity_factories
 from handlers.engine import Engine
 from maps.procgen import generate_dungeon
+import data.color as color
 
 os.environ["path"] = os.path.dirname(sys.executable) + ";" + os.environ["path"]
 
 DATA_FOLDER = "data"
 FONT_FILE = os.path.join(DATA_FOLDER, "dejavu10x10.png")
+
 def main() -> None:
     screen_width = 80
     screen_height = 60
 
     map_width = 80
-    map_height = 55
+    map_height = 53
 
     room_max_size = 10
     room_min_size = 6
@@ -46,6 +48,10 @@ def main() -> None:
     )
     engine.update_fov()
 
+    engine.message_log.add_message(
+        "Hello and welcome, cultivator, to yet another journey in the Murim world!", color.welcome_text
+    )
+
     with tcod.context.new_terminal(
         screen_width,
         screen_height,
@@ -58,7 +64,6 @@ def main() -> None:
             engine.render(console=root_console, context=context)
 
             engine.event_handler.handle_events()
-
 
 
 if __name__ == "__main__":
